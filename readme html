@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLD-HFT-SCALPER · Visual Guide</title>
+<style>
+  :root{
+    --bg-1:#0e1117; --bg-2:#161b22; --bg-3:#1f2632; --bg-4:#262d3d;
+    --line:#2a3242; --line-soft:#1c2230;
+    --gold:#ffd166; --gold-soft:#ffd16633;
+    --accent:#64a8ff; --accent-soft:#64a8ff22;
+    --green:#3ecf8e; --green-soft:#3ecf8e22;
+    --red:#ff6a6a; --red-soft:#ff6a6a22;
+    --amber:#ffae42; --amber-soft:#ffae4222;
+    --purple:#b88dff; --purple-soft:#b88dff22;
+    --text:#e6edf3; --muted:#8b96a8; --muted-2:#5f6b80;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter','Segoe UI',Tahoma,sans-serif;
+    background:radial-gradient(ellipse at top, #1a2233 0%, var(--bg-1) 60%);
+    color:var(--text); line-height:1.55; min-height:100vh;
+  }
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,kbd,pre{font-family:'JetBrains Mono','Consolas',monospace;font-size:.92em}
+  code{background:#0a0d12;color:#cdd6e0;padding:2px 6px;border-radius:4px;border:1px solid var(--line)}
+
+  /* layout */
+  .wrap{max-width:1280px;margin:0 auto;padding:24px}
+  header.hero{
+    background:linear-gradient(135deg,#1a2233 0%,#0f1521 100%);
+    border:1px solid var(--line); border-radius:16px;
+    padding:36px 44px; margin-bottom:28px; position:relative; overflow:hidden;
+  }
+  header.hero::before{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 85% 20%, var(--gold-soft) 0%, transparent 40%);
+    pointer-events:none;
+  }
+  .badge{
+    display:inline-block; background:var(--gold-soft); color:var(--gold);
+    border:1px solid var(--gold); border-radius:999px; padding:4px 12px;
+    font-size:.78em; font-weight:600; letter-spacing:.5px; text-transform:uppercase;
+  }
+  h1{font-size:2.6em;color:var(--gold);margin:8px 0 6px;font-weight:800;letter-spacing:-1px}
+  h1 .sub{color:var(--muted);font-weight:400;font-size:.45em;letter-spacing:0;display:block;margin-top:8px}
+  h2{
+    font-size:1.7em; color:var(--gold); margin:36px 0 16px;
+    padding-bottom:10px; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:10px;
+  }
+  h2 .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--gold); color:#1a1a1a; width:32px; height:32px; border-radius:8px;
+    font-size:.7em; font-weight:800;
+  }
+  h3{color:#fff;margin:22px 0 10px;font-size:1.2em;font-weight:600}
+  p{color:#cdd6e0;margin-bottom:10px}
+  ul,ol{margin:8px 0 14px 22px;color:#cdd6e0}
+  li{margin:5px 0}
+  strong{color:#fff}
+  hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+
+  /* nav */
+  nav.toc{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:12px;
+    padding:18px 22px; margin-bottom:28px;
+  }
+  nav.toc strong{color:var(--gold);display:block;margin-bottom:8px;font-size:.85em;letter-spacing:.5px;text-transform:uppercase}
+  nav.toc ul{list-style:none;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 18px}
+  nav.toc li{margin:0}
+  nav.toc a{color:#cdd6e0;font-size:.95em}
+
+  /* sections */
+  section.card{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:14px;
+    padding:24px 28px; margin-bottom:24px;
+  }
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media (max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;background:#0d1117;border-radius:8px;overflow:hidden;margin:10px 0}
+  th{background:#181f2c;color:var(--gold);padding:10px 14px;text-align:left;font-size:.86em;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--line)}
+  td{padding:10px 14px;color:#cdd6e0;border-top:1px solid var(--line-soft);font-size:.95em;vertical-align:top}
+  tr:hover td{background:#11161f}
+
+  /* tag chips */
+  .chip{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.78em;font-weight:600;letter-spacing:.5px}
+  .chip.gold{background:var(--gold-soft);color:var(--gold);border:1px solid var(--gold)}
+  .chip.acc{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent)}
+  .chip.grn{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
+  .chip.red{background:var(--red-soft);color:var(--red);border:1px solid var(--red)}
+  .chip.amb{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber)}
+  .chip.ppl{background:var(--purple-soft);color:var(--purple);border:1px solid var(--purple)}
+  .chip.mute{background:#232a36;color:#9aa6b8;border:1px solid var(--line)}
+
+  /* callout */
+  .callout{
+    background:#1a2233; border-left:4px solid var(--accent); border-radius:8px;
+    padding:14px 18px; margin:14px 0; color:#cdd6e0;
+  }
+  .callout.warn{border-color:var(--amber);background:#241e15}
+  .callout.danger{border-color:var(--red);background:#231518}
+  .callout.ok{border-color:var(--green);background:#152319}
+  .callout strong{display:block;margin-bottom:4px;color:#fff}
+
+  /* setup card */
+  .setup{
+    background:#0d1117; border:1px solid var(--line); border-radius:12px;
+    padding:18px; transition:transform .15s ease, border-color .15s ease;
+  }
+  .setup:hover{transform:translateY(-2px);border-color:var(--gold)}
+  .setup .head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .setup .num{
+    display:flex;align-items:center;justify-content:center;
+    width:28px;height:28px;border-radius:6px;background:var(--gold);color:#1a1a1a;font-weight:800;font-size:.85em;
+  }
+  .setup .title{color:var(--gold);font-weight:700;font-size:1.05em;flex:1}
+  .setup .tag-chip{
+    background:#1a2233;color:var(--accent);border:1px solid var(--accent);
+    border-radius:5px;padding:2px 8px;font-family:monospace;font-size:.75em;font-weight:700;
+  }
+  .setup .body{color:#cdd6e0;font-size:.92em;margin-bottom:10px}
+  .setup .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+
+  /* score bar (point system) */
+  .scoring{display:flex;flex-direction:column;gap:6px}
+  .row{display:grid;grid-template-columns:200px 1fr 60px;gap:10px;align-items:center}
+  .row .lbl{color:#cdd6e0;font-size:.9em}
+  .row .bar{position:relative;height:20px;background:#11161f;border-radius:4px;overflow:hidden;border:1px solid var(--line-soft)}
+  .row .bar .fill{position:absolute;top:0;height:100%;border-radius:3px}
+  .row .bar .fill.pos{background:linear-gradient(90deg,var(--green),#5fdca0)}
+  .row .bar .fill.neg{background:linear-gradient(90deg,var(--red),#ff8a8a);right:50%}
+  .row .bar .axis{position:absolute;top:0;bottom:0;left:50%;width:1px;background:#3a455c}
+  .row .val{font-family:monospace;font-size:.86em;color:#cdd6e0;text-align:right}
+  .row .val.pos{color:var(--green)}
+  .row .val.neg{color:var(--red)}
+
+  /* flow boxes */
+  .flow{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 0}
+  .frow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+  .box{padding:12px 18px;border-radius:8px;font-size:.92em;font-weight:600;text-align:center;min-width:140px;border:1px solid}
+  .box.start{background:linear-gradient(135deg,#27345a,#1a2645);border-color:#3a4f7a;color:#cfd8e6}
+  .box.intel{background:linear-gradient(135deg,#1d3a36,#15302d);border-color:var(--green);color:#cfeedf}
+  .box.dec{background:linear-gradient(135deg,#3a2c1a,#291e10);border-color:var(--gold);color:#fff5d6}
+  .box.exec{background:linear-gradient(135deg,#1c3a4d,#13283a);border-color:var(--accent);color:#d6e8ff}
+  .box.danger{background:linear-gradient(135deg,#3a1f24,#2a131b);border-color:var(--red);color:#ffd6d6}
+  .arrow{font-size:1.4em;color:var(--muted)}
+  .arrow-d{font-size:1.6em;color:var(--muted)}
+  .branch-label{font-size:.78em;color:var(--muted);font-style:italic;padding:0 4px}
+
+  /* stat tile */
+  .tile{background:#0d1117;border:1px solid var(--line);border-radius:10px;padding:18px;text-align:center}
+  .tile .v{color:var(--gold);font-size:1.8em;font-weight:800;font-family:monospace}
+  .tile .l{color:var(--muted);font-size:.85em;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+  /* timeline (autoprotect) */
+  .timeline{position:relative;padding-left:30px;margin:14px 0}
+  .timeline::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--line)}
+  .tl-item{position:relative;padding:8px 0 14px}
+  .tl-item::before{content:"";position:absolute;left:-26px;top:14px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid var(--bg-2)}
+  .tl-item.green::before{background:var(--green)}
+  .tl-item.amber::before{background:var(--amber)}
+  .tl-item.red::before{background:var(--red)}
+  .tl-item .ttl{color:#fff;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+  .tl-item .desc{color:#cdd6e0;font-size:.9em}
+
+  /* mt5 panel mock */
+  .panel-mock{
+    background:#16191f;border:2px solid #2a3242;border-radius:8px;padding:14px;
+    width:100%;max-width:340px;margin:0 auto;
+    font-family:'Consolas',monospace; color:#e6edf3; font-size:.86em;
+  }
+  .panel-mock .ph{background:#222a39;padding:10px 14px;border-radius:6px;margin:-14px -14px 12px;border-bottom:1px solid #2a3242}
+  .panel-mock .ph .t{color:var(--gold);font-weight:700;font-size:1.1em}
+  .panel-mock .ph .s{color:var(--muted);font-size:.78em}
+  .panel-mock .pb{background:#1c2030;padding:12px;border-radius:6px;margin-bottom:8px}
+  .panel-mock .pb .h{color:var(--accent);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .panel-mock .row-m{display:flex;justify-content:space-between;margin:4px 0}
+  .panel-mock .row-m .k{color:var(--muted-2)}
+  .panel-mock .row-m .v{color:#fff;font-weight:600}
+  .panel-mock .row-m .v.green{color:var(--green)}
+  .panel-mock .row-m .v.red{color:var(--red)}
+  .panel-mock .top{color:#cdd6e0;font-size:.82em;margin:3px 0}
+  .panel-mock .top.t1{color:#cdd6e0}
+  .panel-mock .top.t2{color:#aab3c5}
+  .panel-mock .top.t3{color:#828caa}
+
+  /* pattern svg cards */
+  .pattern{background:#0d1117;border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
+  .pattern svg{display:block;margin:0 auto 8px}
+  .pattern .name{color:var(--gold);font-weight:700;font-size:.95em}
+  .pattern .desc{color:var(--muted);font-size:.82em;margin-top:4px}
+
+  footer{text-align:center;color:var(--muted-2);padding:24px;font-size:.85em;border-top:1px solid var(--line);margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<header class="hero">
+  <span class="badge">Pure Algorithmic · No AI · v1.11</span>
+  <h1>GOLD-HFT-SCALPER
+    <span class="sub">High-Frequency XAUUSD Scalper · 11 ranked setups · point-based decision engine</span>
+  </h1>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:18px;color:var(--muted);font-size:.92em">
+    <span><strong style="color:var(--green)">●</strong> No HTTP / No JSON / No WebRequest whitelist</span>
+    <span><strong style="color:var(--gold)">●</strong> Magic 998877 (separate from AI scalper)</span>
+    <span><strong style="color:var(--accent)">●</strong> Battle-tested AutoProtect every tick</span>
+  </div>
+</header>
+
+<!-- TOC -->
+<nav class="toc">
+  <strong>Contents</strong>
+  <ul>
+    <li><a href="#whatsnew">★ What's new in v1.11</a></li>
+    <li><a href="#overview">1. Overview &amp; Concept</a></li>
+    <li><a href="#install">2. Installation &amp; Setup</a></li>
+    <li><a href="#flow">3. OnTick Flow</a></li>
+    <li><a href="#strategies">4. The 11 Strategies</a></li>
+    <li><a href="#patterns">5. Visual Pattern Reference</a></li>
+    <li><a href="#scoring">6. Point Scoring System</a></li>
+    <li><a href="#ranker">7. The Ranker</a></li>
+    <li><a href="#gates">8. Hard Gates</a></li>
+    <li><a href="#protect">9. Auto-Protect Defense</a></li>
+    <li><a href="#panel">10. The On-Chart Panel</a></li>
+    <li><a href="#inputs">11. Input Reference</a></li>
+    <li><a href="#tuning">12. Tuning Recipes</a></li>
+    <li><a href="#journal">13. CSV Journal</a></li>
+    <li><a href="#faq">14. FAQ</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="whatsnew" style="border:1px solid var(--gold)">
+<h2><span class="num" style="background:var(--gold);color:#1a1a1a">★</span>What's new in v1.11</h2>
+
+<p>v1.11 is the <strong>"production readiness"</strong> pass — eight targeted fixes for going live, all flagged by
+post-v1.10 review. No strategy logic changes; this is performance, safety, and signal-quality plumbing.</p>
+
+<div class="grid-2" style="margin:14px 0">
+  <div class="callout ok"><strong>1. Cached HIGH-impact news block</strong>
+    <code>BlockNewEntriesDueToHighImpactNews</code> now reads a cached boolean populated by
+    <code>CheckEconomicCalendar</code> once per minute. Pre-v1.11 this issued a fresh
+    <code>CalendarValueHistory</code> call <em>per gate check</em> — up to 5× per ranker cycle on a
+    live tick stream.
+  </div>
+  <div class="callout warn"><strong>2. DOM imbalance toggle</strong>
+    New input <code>InpUseDomImbalance</code> (default <code>true</code>). Most retail brokers serve a
+    synthetic B-book DOM that jitters wildly. If you see the DOM Context Bonus oscillating ±8 every
+    tick on the panel, set this to <code>false</code>.
+  </div>
+  <div class="callout ok"><strong>3. R:R ceiling lifted for tight-SL setups</strong>
+    <code>ClampProposalSlToRiskCap</code> now allows up to <strong>8R</strong> for SPIKE / NEWS_CONT / FADE
+    (was hard-capped at 4R). Pattern setups (FLAG/ABCD/Level/etc) keep the 4R ceiling.
+  </div>
+  <div class="callout"><strong>4. Close-tag FIFO queue</strong>
+    Replaced the single <code>g_LastCloseTag</code> string with an 8-slot FIFO queue
+    (<code>PushCloseTag</code>/<code>PopCloseTag</code>). Partial-close races (TP partial + runner close
+    in the same tick) now each get the correct exit tag in the journal.
+  </div>
+  <div class="callout"><strong>5. Throttled <code>ChartRedraw</code></strong>
+    <code>UpdatePanel</code> now triggers <code>ChartRedraw(0)</code> only every
+    <code>InpPanelRedrawEveryN</code> ticks (default 5). Trade fills/exits force-redraw immediately
+    via <code>ForceChartRedraw()</code>.
+  </div>
+  <div class="callout ok"><strong>6. Adaptive retrace widening</strong>
+    If today's <code>ARTR</code> exit count ≥ <code>InpAdaptiveRetraceTrigger</code> (default 3), the chop &amp;
+    run retrace thresholds are multiplied by <code>InpAdaptiveRetraceMul</code> (default 1.20). Same-day
+    feedback loop, so it self-corrects once the regime calms.
+  </div>
+  <div class="callout warn"><strong>7. Weekend-gap protection</strong>
+    Friday after <code>InpFridayCloseHour</code> (default 20:00 server) marks
+    <code>g_Session = WEEKEND_CLOSE</code> — no new entries. Existing positions still managed by
+    AutoProtect. Toggle: <code>InpAvoidWeekendGap</code>.
+  </div>
+  <div class="callout"><strong>8. Tick buffer 200 → 500 + dynamic lookback</strong>
+    Microstructure window now starts at 30 ticks but expands until it spans ≥ 1 second of data,
+    capped at 250. Stable velocity/acceleration math during NY-open spikes where 200 ticks can fire
+    in &lt; 2 seconds.
+  </div>
+</div>
+
+<h3 style="margin-top:14px">Carry-forward from v1.10</h3>
+<p style="font-size:13px;color:var(--mute)">All v1.10 features remain: hybrid SL-clamp + lot auto-shrink, asymmetric sizing, per-setup-kind
+suspension, spread-cost penalty, DOM imbalance scoring, session-open window flag, ABCD/Level
+throttle, setup-category prior weights, exit-reason CSV column, diagnostic dashboard panel.</p>
+
+</section>
+
+<section class="card">
+<h2><span class="num">★</span>v1.10 reference (still in effect)</h2>
+
+<p>v1.10 was the <strong>"actually trades and explains itself"</strong> release. Original v1.00 backtest blocked
+100% of high-score trades with <code>risk $X &gt; cap $4.75</code>. This is the v1.10 changelog kept here
+for traceability — every v1.10 fix is still active in v1.11.</p>
+
+<div class="grid-2" style="margin:14px 0">
+  <div class="callout ok"><strong>1. Hybrid risk-cap fix</strong>
+    Each strategy first <code>ClampProposalSlToRiskCap</code> shrinks SL to fit cap (preserving R:R),
+    then <code>ExecuteProposal</code> auto-shrinks lot when needed. Trades only get rejected if even
+    the broker minimum lot exceeds the cap.
+  </div>
+  <div class="callout ok"><strong>2. Asymmetric position sizing</strong>
+    Score 60-74 → <strong>50%</strong> lot, 75-84 → <strong>75%</strong>, 85+ → <strong>100%</strong>. Combined multiplicatively with regime mul.
+    Inputs: <code>InpAsymSize</code>, <code>InpAsymMul_60_75</code>/<code>_75_85</code>/<code>_85_plus</code>.
+  </div>
+  <div class="callout"><strong>3. Per-setup-kind suspension</strong>
+    Two consecutive losses on the same setup kind → that kind suspended for
+    <code>InpSuspendDurationMin</code> (45 min default). Surfaced live on the panel.
+  </div>
+  <div class="callout"><strong>4. Spread-cost score penalty</strong>
+    If spread eats &gt; 25% of T1 distance: <span class="chip red">-12</span>. 15-25%: <span class="chip amb">-7</span>. 8-15%: <span class="chip mute">-3</span>.
+  </div>
+  <div class="callout"><strong>5. DOM imbalance scoring</strong>
+    Bid/ask depth |imb| ≥ 60% aligned: <span class="chip grn">+8</span>; against: <span class="chip red">-6</span>.
+    Soft 40-60%: <span class="chip acc">±3/2</span>.
+  </div>
+  <div class="callout"><strong>6. Session-open window</strong>
+    First 15 min after London/NY open: SPK/NEWS-Cont <span class="chip grn">+6</span>, FLG/ABCD <span class="chip red">-4</span>.
+    Input: <code>InpSessionOpenWindowMin</code>.
+  </div>
+  <div class="callout warn"><strong>7. ABCD &amp; Level throttle</strong>
+    Raw scores raised (ABCD <strong>62 → 74</strong>, Level <strong>60 → 72</strong>) and both now require
+    <code>M5_ADX ≥ 22</code> (Level: OR confirmed magnet). Less noise.
+  </div>
+  <div class="callout"><strong>8. Setup category prior weights</strong>
+    Final score multiplied by category weight: SPIKE/NEWS <span class="chip grn">×1.12</span>,
+    FLAG/EMA/ORB <span class="chip amb">×0.95</span>, others <span class="chip mute">×1.00</span>.
+  </div>
+  <div class="callout ok"><strong>9. Exit-reason CSV column</strong>
+    Every <code>EXIT_*</code> row now logs <code>exit_reason=&lt;TAG&gt;</code> — ANRD, ARTR, ABNK, AGVE, AEMR, ACUT, ATIM, MPRT, SL, TP, MAN, OTH.
+    Also kept as a daily mini-tally on the panel.
+  </div>
+  <div class="callout"><strong>10. Brand-new diagnostic panel</strong>
+    380×~840 dashboard with 6 sections, full per-top-3 block reasons (no more 22-char truncation),
+    daily-P/L progress bar, suspended-setup list with countdown, exit-tally, DOM &amp; ATR fields.
+  </div>
+</div>
+
+<h3>Why your last backtest produced 0 trades — and what changed</h3>
+<table>
+  <tr><th>Symptom</th><th>Cause</th><th>v1.10 fix</th></tr>
+  <tr><td><code>risk $10..$130 &gt; cap $4.75</code></td>
+      <td>VWAP/ABCD/Level placed SLs much wider than cap distance at <code>InpLotSize</code></td>
+      <td>SL clamp → preserved R:R; lot auto-shrinks to fit cap; only rejects if min-lot can't fit</td></tr>
+  <tr><td><code>M15 bullish (block short)</code> ×30</td>
+      <td>M15 was bullish all session; only SHORT setups proposed = generator bias under uptrend</td>
+      <td>Working as designed — but category weights + asym sizing now redistribute scoring so trend-aligned LONG setups can win the rank</td></tr>
+  <tr><td><code>session closed</code> at 21:00</td>
+      <td>NY end input (<code>InpNYEnd=21</code>)</td>
+      <td>Adjustable input. Panel now shows <em>"closes 142m"</em> so you see this coming</td></tr>
+  <tr><td><code>RSI 19.5 &lt;= short floor</code></td>
+      <td>RSI block on extremes (<code>InpRsiBlockShortBelow=25</code>)</td>
+      <td>Working as designed — caps catch dangerous short entries at oversold extremes</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="overview">
+<h2><span class="num">1</span>Overview &amp; Concept</h2>
+
+<div class="grid-4" style="margin:14px 0">
+  <div class="tile"><div class="v">11</div><div class="l">Strategy generators</div></div>
+  <div class="tile"><div class="v">~3s</div><div class="l">Ranker cycle (HFT)</div></div>
+  <div class="tile"><div class="v">M1</div><div class="l">Recommended TF</div></div>
+  <div class="tile"><div class="v">0</div><div class="l">External calls</div></div>
+</div>
+
+<p>
+  Each ranker cycle, every enabled strategy <strong>scans the market in parallel</strong> and proposes
+  zero or one trade. Each proposal is a tiny struct with direction, entry price, strategy-specific
+  stop-loss, three target levels, R:R, and a numeric <strong>score</strong>. The score equals the
+  strategy's raw rating (e.g. Spike = 70) <em>plus</em> a universal context bonus (HTF confluence,
+  ADX, microstructure, regime, VWAP side, spread, etc).
+</p>
+
+<p>
+  The <strong>Ranker</strong> sorts proposals descending. The top one must clear
+  <code>InpMinSetupScore</code> (default <strong>60</strong>) and a chain of hard gates (spread,
+  daily-loss halt, news blackout, R:R floor, $-risk cap). Then <code>ExecuteProposal</code> opens
+  the trade with the strategy's own SL price, capped by the global risk cap.
+</p>
+
+<p>
+  Once in a position, <code>AutoProtectProfit</code> runs <strong>every tick</strong> with a layered
+  defense — break-even, micro-lock ladder, profit-lock ladder, NORED (no red after green), retrace
+  from peak, gave-back protection. Plus a 70 % high-water trail every <code>InpAPTrailIntervalSec</code>.
+</p>
+
+<div class="callout">
+  <strong>Why this beats a single hardcoded strategy</strong>
+  Markets cycle through trend / chop / spike / news / range. By running 11 specialized hunters in
+  parallel and picking the best-scoring one, the EA naturally adapts to <em>whatever</em> the
+  market is doing right now. Trending? <span class="chip grn">Flag</span>
+  <span class="chip grn">EMA Pullback</span> dominate. Ranging at a level?
+  <span class="chip ppl">Bounce</span> <span class="chip ppl">Fade</span>. Explosive?
+  <span class="chip red">Spike</span> <span class="chip red">News-Cont</span>.
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="install">
+<h2><span class="num">2</span>Installation &amp; Setup</h2>
+
+<div class="grid-2">
+  <div>
+    <h3>Where to put the file</h3>
+    <ol>
+      <li>Open MT5 → <code>File → Open Data Folder</code></li>
+      <li>Navigate to <code>MQL5\Experts\</code></li>
+      <li>Copy <code>GOLD-HFT-SCALPER.mq5</code> there (or its <code>.ex5</code> if you don't want to recompile)</li>
+      <li>Back in MT5: <kbd>F5</kbd> in MetaEditor (or right-click in Navigator → Refresh)</li>
+    </ol>
+
+    <h3>Attach to chart</h3>
+    <ol>
+      <li>Open <strong>XAUUSD M1</strong> chart (or whatever your broker calls Gold)</li>
+      <li>Drag <strong>GOLD-HFT-SCALPER</strong> from Navigator → Experts onto the chart</li>
+      <li>Popup → <strong>Common</strong> tab → tick <em>Allow Algo Trading</em></li>
+      <li>Popup → <strong>Inputs</strong> tab → leave defaults, or tweak <code>InpLotSize</code>, <code>InpMaxRiskDollars</code></li>
+      <li>Click OK. Make sure top-toolbar <strong>Algo Trading</strong> button is green.</li>
+    </ol>
+  </div>
+
+  <div>
+    <h3>Recommended timeframe</h3>
+    <table>
+      <tr><th>Chart</th><th>Profile</th></tr>
+      <tr><td><strong style="color:var(--green)">M1</strong></td>
+          <td>Recommended. Max tick rate, matches default <code>InpEntryNewBarTimeframe = M1</code> + 3s interval.</td></tr>
+      <tr><td>M5</td>
+          <td>Calmer view. Set <code>InpEntryNewBarTimeframe = M5</code> + interval 60 for less action.</td></tr>
+      <tr><td>M15+</td>
+          <td>UI only — strategies still run on every tick.</td></tr>
+    </table>
+    <p><em>The chart timeframe never affects strategy logic — the EA pulls M1, M5, M15, H1, D1, W1 internally.</em></p>
+
+    <h3>What you do NOT need</h3>
+    <div class="callout ok">
+      <strong>Zero external setup</strong>
+      No API key. No <code>WebRequest</code> URL whitelist. No internet for trading.
+      Just MT5 and your broker connection.
+    </div>
+
+    <h3>Coexists with the AI scalper</h3>
+    <p>
+      Magic number is <code>998877</code> (the AI version uses <code>778899</code>). Different CSV journal too.
+      Run both side-by-side on different charts if you want.
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="flow">
+<h2><span class="num">3</span>OnTick Flow</h2>
+
+<p>What happens on every single tick the EA receives:</p>
+
+<div class="flow">
+  <div class="frow">
+    <div class="box start">⚡ Tick fires</div>
+    <span class="arrow">→</span>
+    <div class="box intel">RecordTick + AnalyzeMicrostructure</div>
+    <span class="arrow">→</span>
+    <div class="box intel">CheckNewDay + UpdateMarketData</div>
+  </div>
+  <span class="arrow-d">↓</span>
+  <div class="frow">
+    <div class="box dec">Every 5 ticks?</div>
+    <span class="branch-label">yes</span>
+    <span class="arrow">→</span>
+    <div class="box intel">Targets + Levels + News + MT5 Intel</div>
+  </div>
+  <span class="arrow-d">↓</span>
+  <div class="frow">
+    <div class="box dec">Position open?</div>
+  </div>
+
+  <div class="grid-2" style="width:100%;margin-top:10px">
+    <div style="border:1px dashed var(--line);border-radius:10px;padding:14px">
+      <p style="text-align:center;color:var(--muted);margin-bottom:10px"><em>Branch A · YES (in trade)</em></p>
+      <div class="flow">
+        <div class="box exec">⚙ AutoProtectProfit (every tick)</div>
+        <span class="arrow-d">↓</span>
+        <div class="box dec">Trail interval elapsed?</div>
+        <span class="arrow-d">↓</span>
+        <div class="box exec">📈 TrailStop (70% lock)</div>
+      </div>
+    </div>
+    <div style="border:1px dashed var(--line);border-radius:10px;padding:14px">
+      <p style="text-align:center;color:var(--muted);margin-bottom:10px"><em>Branch B · NO (flat)</em></p>
+      <div class="flow">
+        <div class="box dec">New bar AND interval &ge; 3s?</div>
+        <span class="arrow-d">↓</span>
+        <div class="box intel">Refresh: RunAnalysis + VWAP/ORB</div>
+        <span class="arrow-d">↓</span>
+        <div class="box dec">🎯 RunRanker (score 11 setups)</div>
+        <span class="arrow-d">↓</span>
+        <div class="box dec">Top score &ge; 60?</div>
+        <span class="arrow-d">↓</span>
+        <div class="box dec">PassesGlobalHardGates?</div>
+        <span class="arrow-d">↓</span>
+        <div class="box exec">⚡ ExecuteProposal (BUY/SELL)</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="strategies">
+<h2><span class="num">4</span>The 11 Strategy Generators</h2>
+
+<p>Each generator has its own enable toggle, raw score, and SL multiplier. Higher raw score = stronger
+candidate in the ranking before context bonus.</p>
+
+<div class="grid-2">
+
+  <div class="setup">
+    <div class="head"><div class="num">1</div>
+      <div class="title">SPIKE — Momentum capture</div><div class="tag-chip">SPK</div></div>
+    <div class="body">Last M1 body ≥ <code>1.4× ATR(M1)</code>, microstructure imbalance ≥ ±25 %, tick velocity matches body sign.</div>
+    <div class="meta">
+      <span class="chip red">SL: 0.6× ATR(M1)</span>
+      <span class="chip gold">Raw 70</span>
+      <span class="chip mute">Bypasses HTF / M1-align gates</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">2</div>
+      <div class="title">FLAG — Bull/Bear continuation</div><div class="tag-chip">FLG</div></div>
+    <div class="body">M5 trend ≥ 70 %, 1–4 counter-color pullback bars holding M5 EMA9, then break of pullback range in trend direction.</div>
+    <div class="meta">
+      <span class="chip amb">SL: 1.0× ATR(M5)</span>
+      <span class="chip gold">Raw 65</span>
+      <span class="chip grn">Trend-day favorite</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">3</div>
+      <div class="title">ORB — Opening Range Breakout</div><div class="tag-chip">ORB</div></div>
+    <div class="body">After the 15-min London or NY open range closes, price breaks ORB high (long) or low (short). Optional retest.</div>
+    <div class="meta">
+      <span class="chip amb">SL: 1.1× ATR(M5)</span>
+      <span class="chip gold">Raw 68</span>
+      <span class="chip acc">Best in first 2h of session</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">4</div>
+      <div class="title">VWAP RECLAIM</div><div class="tag-chip">VWR</div></div>
+    <div class="body">Last M1 wicked through session VWAP and closed back on the other side, with min displacement 20 pts.</div>
+    <div class="meta">
+      <span class="chip amb">SL: 1.0× ATR(M5)</span>
+      <span class="chip gold">Raw 60</span>
+      <span class="chip ppl">Mean-reversion play</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">5</div>
+      <div class="title">VWAP REJECT</div><div class="tag-chip">VWJ</div></div>
+    <div class="body">M1 touched VWAP and rejected back into the established M5 trend (continuation away from VWAP).</div>
+    <div class="meta">
+      <span class="chip amb">SL: 1.0× ATR(M5)</span>
+      <span class="chip gold">Raw 65</span>
+      <span class="chip grn">Trend-aligned</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">6</div>
+      <div class="title">ABCD — Pattern continuation</div><div class="tag-chip">ABC</div></div>
+    <div class="body">A→B impulse ≥ 60 pts on M5, B→C pullback 30–70 % of impulse, C→D continuation candle confirms the pattern.</div>
+    <div class="meta">
+      <span class="chip amb">SL: 1.0× ATR(M5)</span>
+      <span class="chip gold">Raw 62</span>
+      <span class="chip acc">Classic Aziz pattern</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">7</div>
+      <div class="title">LEVEL BOUNCE</div><div class="tag-chip">LBN</div></div>
+    <div class="body">M1 wicked into closest level (round, PDH/PDL, PWH/PWL, session H/L, recent M5 pivot) and rejected.</div>
+    <div class="meta">
+      <span class="chip amb">SL: 0.9× ATR(M5)</span>
+      <span class="chip gold">Raw 64</span>
+      <span class="chip ppl">Range-day hunter</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">8</div>
+      <div class="title">LEVEL BREAK</div><div class="tag-chip">LBR</div></div>
+    <div class="body">M1 closed past one of those levels with body ≥ 0.8× ATR(M1) — ATR-expansion confirmation.</div>
+    <div class="meta">
+      <span class="chip amb">SL: 0.9× ATR(M5)</span>
+      <span class="chip gold">Raw 66</span>
+      <span class="chip grn">Higher-conviction than bounce</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">9</div>
+      <div class="title">EMA PULLBACK</div><div class="tag-chip">EMA</div></div>
+    <div class="body">Established M5 trend; bar touched M5 EMA9 (or M15 EMA20) within 25 pts and closed back in trend direction.</div>
+    <div class="meta">
+      <span class="chip amb">SL: 1.0× ATR</span>
+      <span class="chip gold">Raw 58</span>
+      <span class="chip grn">Trend pullback</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">10</div>
+      <div class="title">NEWS CONTINUATION</div><div class="tag-chip">NWC</div></div>
+    <div class="body">≤ 180 sec since a HIGH-impact event passed AND last M1 body ≥ 1.2× ATR(M1) — ride the post-news leg.</div>
+    <div class="meta">
+      <span class="chip red">SL: 0.9× ATR(M1)</span>
+      <span class="chip gold">Raw 75 (highest)</span>
+      <span class="chip mute">Bypasses news blackout</span>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="num">11</div>
+      <div class="title">FADE — Counter-trend extreme</div><div class="tag-chip">FAD</div></div>
+    <div class="body">RSI ≤ 22 or ≥ 78 AND price at a magnet level AND microstructure exhaustion. The only counter-trend setup.</div>
+    <div class="meta">
+      <span class="chip red">SL: 0.5× ATR(M1) tightest</span>
+      <span class="chip gold">Raw 55 (lowest)</span>
+      <span class="chip ppl">Bypasses RSI / HTF gates</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="patterns">
+<h2><span class="num">5</span>Visual Pattern Reference</h2>
+
+<p>Tiny illustrations of what each setup is hunting for. Green = bullish version (mirror for bearish).</p>
+
+<div class="grid-3">
+
+  <!-- SPIKE -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <rect x="20" y="80" width="14" height="10" fill="#5fdca0"/>
+      <rect x="40" y="78" width="14" height="12" fill="#ff8a8a"/>
+      <rect x="60" y="76" width="14" height="14" fill="#5fdca0"/>
+      <rect x="80" y="76" width="14" height="14" fill="#ff8a8a"/>
+      <rect x="100" y="74" width="14" height="16" fill="#5fdca0"/>
+      <rect x="120" y="20" width="14" height="70" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <line x1="127" y1="14" x2="127" y2="20" stroke="#3ecf8e" stroke-width="2"/>
+      <line x1="127" y1="90" x2="127" y2="96" stroke="#3ecf8e" stroke-width="2"/>
+      <text x="138" y="40" fill="#ffd166" font-size="11" font-family="monospace">SPIKE</text>
+      <text x="138" y="55" fill="#8b96a8" font-size="10">body 1.4×ATR</text>
+    </svg>
+    <div class="name">Spike (1)</div>
+    <div class="desc">Big impulse body + flow imbalance</div>
+  </div>
+
+  <!-- FLAG -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <rect x="15" y="75" width="10" height="20" fill="#3ecf8e"/>
+      <rect x="28" y="65" width="10" height="30" fill="#3ecf8e"/>
+      <rect x="41" y="50" width="10" height="45" fill="#3ecf8e"/>
+      <rect x="54" y="35" width="10" height="60" fill="#3ecf8e"/>
+      <rect x="67" y="25" width="10" height="70" fill="#3ecf8e"/>
+      <!-- pullback -->
+      <rect x="80" y="30" width="10" height="20" fill="#ff6a6a"/>
+      <rect x="93" y="35" width="10" height="20" fill="#ff6a6a"/>
+      <!-- breakout -->
+      <rect x="106" y="20" width="10" height="35" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <line x1="80" y1="20" x2="195" y2="20" stroke="#ffd166" stroke-dasharray="3,3"/>
+      <text x="125" y="42" fill="#ffd166" font-size="11" font-family="monospace">BREAK</text>
+      <text x="125" y="56" fill="#8b96a8" font-size="10">break pullback hi</text>
+    </svg>
+    <div class="name">Bull Flag (2)</div>
+    <div class="desc">Trend → pullback → break</div>
+  </div>
+
+  <!-- ORB -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <!-- ORB box -->
+      <rect x="15" y="50" width="80" height="40" fill="#64a8ff22" stroke="#64a8ff" stroke-dasharray="3,3"/>
+      <text x="22" y="46" fill="#64a8ff" font-size="9">ORB 15min</text>
+      <line x1="15" y1="50" x2="195" y2="50" stroke="#64a8ff" stroke-dasharray="3,3"/>
+      <line x1="15" y1="90" x2="195" y2="90" stroke="#64a8ff" stroke-dasharray="3,3"/>
+      <!-- bars in range -->
+      <rect x="20" y="62" width="8" height="20" fill="#5fdca0"/>
+      <rect x="35" y="58" width="8" height="28" fill="#ff8a8a"/>
+      <rect x="50" y="65" width="8" height="20" fill="#5fdca0"/>
+      <rect x="65" y="60" width="8" height="25" fill="#5fdca0"/>
+      <rect x="80" y="55" width="8" height="32" fill="#3ecf8e"/>
+      <!-- breakout -->
+      <rect x="100" y="35" width="10" height="30" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <rect x="115" y="25" width="10" height="25" fill="#3ecf8e"/>
+      <rect x="130" y="18" width="10" height="22" fill="#3ecf8e"/>
+      <text x="148" y="32" fill="#ffd166" font-size="11" font-family="monospace">BREAK</text>
+    </svg>
+    <div class="name">ORB (3)</div>
+    <div class="desc">Breakout from session open range</div>
+  </div>
+
+  <!-- VWAP RECLAIM -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <line x1="15" y1="55" x2="195" y2="55" stroke="#b88dff" stroke-dasharray="4,3" stroke-width="1.5"/>
+      <text x="160" y="50" fill="#b88dff" font-size="10">VWAP</text>
+      <rect x="20" y="50" width="10" height="20" fill="#ff6a6a"/>
+      <rect x="33" y="58" width="10" height="22" fill="#ff6a6a"/>
+      <rect x="46" y="65" width="10" height="22" fill="#ff6a6a"/>
+      <rect x="59" y="70" width="10" height="20" fill="#ff8a8a"/>
+      <!-- wick down then close back above VWAP -->
+      <line x1="78" y1="50" x2="78" y2="80" stroke="#3ecf8e" stroke-width="1"/>
+      <rect x="73" y="50" width="10" height="14" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <rect x="86" y="40" width="10" height="22" fill="#3ecf8e"/>
+      <rect x="99" y="32" width="10" height="22" fill="#3ecf8e"/>
+      <text x="115" y="40" fill="#ffd166" font-size="11" font-family="monospace">RECLAIM</text>
+    </svg>
+    <div class="name">VWAP Reclaim (4)</div>
+    <div class="desc">Wick below VWAP, close above</div>
+  </div>
+
+  <!-- ABCD -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <!-- A point (low) -->
+      <circle cx="25" cy="90" r="4" fill="#ffd166"/>
+      <text x="20" y="108" fill="#ffd166" font-size="11">A</text>
+      <!-- B point (high) -->
+      <circle cx="80" cy="35" r="4" fill="#ffd166"/>
+      <text x="76" y="28" fill="#ffd166" font-size="11">B</text>
+      <!-- C point (mid retrace) -->
+      <circle cx="125" cy="60" r="4" fill="#ffd166"/>
+      <text x="120" y="78" fill="#ffd166" font-size="11">C</text>
+      <!-- D point projection -->
+      <circle cx="180" cy="20" r="4" fill="#3ecf8e"/>
+      <text x="175" y="14" fill="#3ecf8e" font-size="11">D</text>
+      <line x1="25" y1="90" x2="80" y2="35" stroke="#3ecf8e" stroke-width="2"/>
+      <line x1="80" y1="35" x2="125" y2="60" stroke="#ff6a6a" stroke-width="2"/>
+      <line x1="125" y1="60" x2="180" y2="20" stroke="#3ecf8e" stroke-width="2" stroke-dasharray="4,3"/>
+    </svg>
+    <div class="name">ABCD (6)</div>
+    <div class="desc">Impulse · pullback · resume</div>
+  </div>
+
+  <!-- LEVEL BOUNCE -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <line x1="15" y1="80" x2="195" y2="80" stroke="#ffd166" stroke-dasharray="4,3" stroke-width="2"/>
+      <text x="155" y="75" fill="#ffd166" font-size="10">PDL/Round</text>
+      <rect x="20" y="40" width="10" height="35" fill="#ff6a6a"/>
+      <rect x="33" y="50" width="10" height="25" fill="#ff6a6a"/>
+      <rect x="46" y="60" width="10" height="20" fill="#ff8a8a"/>
+      <!-- wick down to level -->
+      <line x1="62" y1="78" x2="62" y2="92" stroke="#3ecf8e" stroke-width="1"/>
+      <rect x="57" y="65" width="10" height="13" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <rect x="70" y="55" width="10" height="20" fill="#3ecf8e"/>
+      <rect x="83" y="40" width="10" height="25" fill="#3ecf8e"/>
+      <rect x="96" y="30" width="10" height="20" fill="#3ecf8e"/>
+      <text x="115" y="45" fill="#ffd166" font-size="11" font-family="monospace">BOUNCE</text>
+    </svg>
+    <div class="name">Level Bounce (7)</div>
+    <div class="desc">Wick into level + rejection</div>
+  </div>
+
+  <!-- LEVEL BREAK -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <line x1="15" y1="40" x2="195" y2="40" stroke="#ffd166" stroke-dasharray="4,3" stroke-width="2"/>
+      <text x="155" y="35" fill="#ffd166" font-size="10">PDH/Round</text>
+      <rect x="20" y="50" width="10" height="30" fill="#5fdca0"/>
+      <rect x="33" y="48" width="10" height="32" fill="#3ecf8e"/>
+      <rect x="46" y="45" width="10" height="35" fill="#3ecf8e"/>
+      <!-- bar that closes above level with big body -->
+      <rect x="60" y="20" width="12" height="25" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <text x="78" y="30" fill="#ffd166" font-size="11" font-family="monospace">BREAK + ATR</text>
+      <rect x="80" y="15" width="10" height="20" fill="#3ecf8e"/>
+      <rect x="93" y="12" width="10" height="22" fill="#3ecf8e"/>
+    </svg>
+    <div class="name">Level Break (8)</div>
+    <div class="desc">Close past level + ATR-expansion</div>
+  </div>
+
+  <!-- EMA PULLBACK -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <path d="M 15 80 Q 60 50 110 45 T 200 25" fill="none" stroke="#64a8ff" stroke-width="2" stroke-dasharray="4,3"/>
+      <text x="160" y="20" fill="#64a8ff" font-size="10">EMA9</text>
+      <rect x="20" y="65" width="8" height="25" fill="#5fdca0"/>
+      <rect x="32" y="60" width="8" height="25" fill="#3ecf8e"/>
+      <rect x="44" y="50" width="8" height="30" fill="#3ecf8e"/>
+      <rect x="56" y="45" width="8" height="25" fill="#3ecf8e"/>
+      <!-- pullback to EMA -->
+      <rect x="68" y="40" width="8" height="14" fill="#ff8a8a"/>
+      <line x1="76" y1="48" x2="76" y2="55" stroke="#3ecf8e" stroke-width="1"/>
+      <rect x="80" y="35" width="10" height="14" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <rect x="93" y="28" width="8" height="20" fill="#3ecf8e"/>
+      <rect x="105" y="22" width="8" height="22" fill="#3ecf8e"/>
+      <text x="120" y="35" fill="#ffd166" font-size="11" font-family="monospace">PULLBACK</text>
+    </svg>
+    <div class="name">EMA Pullback (9)</div>
+    <div class="desc">Touch EMA + resume in trend</div>
+  </div>
+
+  <!-- NEWS CONT -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <line x1="60" y1="10" x2="60" y2="100" stroke="#ff6a6a" stroke-width="2" stroke-dasharray="2,2"/>
+      <text x="22" y="20" fill="#ff6a6a" font-size="10">NFP/CPI/FOMC</text>
+      <rect x="15" y="70" width="8" height="22" fill="#ff8a8a"/>
+      <rect x="27" y="68" width="8" height="22" fill="#5fdca0"/>
+      <rect x="39" y="72" width="8" height="20" fill="#ff8a8a"/>
+      <rect x="51" y="70" width="8" height="22" fill="#5fdca0"/>
+      <!-- spike -->
+      <rect x="65" y="20" width="14" height="60" fill="#3ecf8e" stroke="#fff" stroke-width="1.5"/>
+      <rect x="84" y="15" width="14" height="20" fill="#3ecf8e"/>
+      <rect x="103" y="10" width="14" height="22" fill="#3ecf8e"/>
+      <text x="125" y="40" fill="#ffd166" font-size="11" font-family="monospace">RIDE IT</text>
+      <text x="125" y="54" fill="#8b96a8" font-size="9">≤ 3 min after</text>
+    </svg>
+    <div class="name">News-Continuation (10)</div>
+    <div class="desc">Post-news impulse continuation</div>
+  </div>
+
+  <!-- FADE -->
+  <div class="pattern">
+    <svg width="220" height="120" viewBox="0 0 220 120">
+      <line x1="10" y1="100" x2="210" y2="100" stroke="#3a455c" stroke-width="1"/>
+      <line x1="15" y1="35" x2="195" y2="35" stroke="#ffd166" stroke-dasharray="4,3"/>
+      <text x="160" y="30" fill="#ffd166" font-size="10">Magnet</text>
+      <rect x="15" y="80" width="8" height="15" fill="#5fdca0"/>
+      <rect x="27" y="70" width="8" height="22" fill="#3ecf8e"/>
+      <rect x="39" y="60" width="8" height="22" fill="#3ecf8e"/>
+      <rect x="51" y="50" width="8" height="20" fill="#3ecf8e"/>
+      <!-- exhaustion at extreme -->
+      <line x1="68" y1="25" x2="68" y2="50" stroke="#ff6a6a" stroke-width="1"/>
+      <rect x="63" y="35" width="10" height="15" fill="#ff8a8a"/>
+      <rect x="76" y="40" width="8" height="20" fill="#ff6a6a" stroke="#fff" stroke-width="1.5"/>
+      <rect x="88" y="50" width="8" height="22" fill="#ff6a6a"/>
+      <rect x="100" y="60" width="8" height="20" fill="#ff6a6a"/>
+      <text x="115" y="65" fill="#ffd166" font-size="11" font-family="monospace">FADE</text>
+      <text x="115" y="78" fill="#8b96a8" font-size="9">RSI≥78 + exh</text>
+    </svg>
+    <div class="name">Fade (11)</div>
+    <div class="desc">RSI extreme + magnet + exhaustion</div>
+  </div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="scoring">
+<h2><span class="num">6</span>Point Scoring System</h2>
+
+<p>Every proposal's final score = strategy raw + universal context bonus. The bonus is the same
+formula for every setup (with a few setup-specific exemptions noted in chips).</p>
+
+<h3>Higher-TF confluence</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">M15 aligns with direction</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:24%"></div><div class="axis"></div></div>
+    <div class="val pos">+12</div></div>
+  <div class="row"><div class="lbl">M15 against direction</div>
+    <div class="bar"><div class="fill neg" style="width:30%"></div><div class="axis"></div></div>
+    <div class="val neg">−15</div></div>
+  <div class="row"><div class="lbl">H1 aligns</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:16%"></div><div class="axis"></div></div>
+    <div class="val pos">+8</div></div>
+  <div class="row"><div class="lbl">H1 against</div>
+    <div class="bar"><div class="fill neg" style="width:20%"></div><div class="axis"></div></div>
+    <div class="val neg">−10</div></div>
+  <div class="row"><div class="lbl">M15+H1 both align (combo)</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:10%"></div><div class="axis"></div></div>
+    <div class="val pos">+5</div></div>
+</div>
+
+<h3 style="margin-top:18px">ADX (M5 trend strength)</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">ADX ≥ 28 (strong)</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:20%"></div><div class="axis"></div></div>
+    <div class="val pos">+10</div></div>
+  <div class="row"><div class="lbl">ADX 20–28 (moderate)</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:10%"></div><div class="axis"></div></div>
+    <div class="val pos">+5</div></div>
+  <div class="row"><div class="lbl">ADX &lt; 18 (chop)</div>
+    <div class="bar"><div class="fill neg" style="width:12%"></div><div class="axis"></div></div>
+    <div class="val neg">−6</div></div>
+</div>
+
+<h3 style="margin-top:18px">Microstructure</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">Order-flow imbalance with dir</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:24%"></div><div class="axis"></div></div>
+    <div class="val pos">+12</div></div>
+  <div class="row"><div class="lbl">Order-flow imbalance against</div>
+    <div class="bar"><div class="fill neg" style="width:20%"></div><div class="axis"></div></div>
+    <div class="val neg">−10</div></div>
+  <div class="row"><div class="lbl">Tick velocity with dir (&gt;8 pts/s)</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:16%"></div><div class="axis"></div></div>
+    <div class="val pos">+8</div></div>
+</div>
+
+<h3 style="margin-top:18px">Volatility regime</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">NORMAL or ELEVATED</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:16%"></div><div class="axis"></div></div>
+    <div class="val pos">+8</div></div>
+  <div class="row"><div class="lbl">EXPLOSIVE (Spike / News)</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:24%"></div><div class="axis"></div></div>
+    <div class="val pos">+12</div></div>
+  <div class="row"><div class="lbl">EXPLOSIVE (other setups)</div>
+    <div class="bar"><div class="fill neg" style="width:8%"></div><div class="axis"></div></div>
+    <div class="val neg">−4</div></div>
+  <div class="row"><div class="lbl">QUIET (most setups)</div>
+    <div class="bar"><div class="fill neg" style="width:20%"></div><div class="axis"></div></div>
+    <div class="val neg">−10</div></div>
+</div>
+
+<h3 style="margin-top:18px">Other context</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">VWAP side OK</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:12%"></div><div class="axis"></div></div>
+    <div class="val pos">+6</div></div>
+  <div class="row"><div class="lbl">Tight spread (&le; 25 pts)</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:10%"></div><div class="axis"></div></div>
+    <div class="val pos">+5</div></div>
+  <div class="row"><div class="lbl">Spread spike vs p90</div>
+    <div class="bar"><div class="fill neg" style="width:30%"></div><div class="axis"></div></div>
+    <div class="val neg">−15</div></div>
+  <div class="row"><div class="lbl">Magnet obstacle (non-level setups)</div>
+    <div class="bar"><div class="fill neg" style="width:20%"></div><div class="axis"></div></div>
+    <div class="val neg">−10</div></div>
+  <div class="row"><div class="lbl">News blackout (non-news/spike)</div>
+    <div class="bar"><div class="fill neg" style="width:60%"></div><div class="axis"></div></div>
+    <div class="val neg">−30</div></div>
+  <div class="row"><div class="lbl">Calendar clear</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:6%"></div><div class="axis"></div></div>
+    <div class="val pos">+3</div></div>
+  <div class="row"><div class="lbl">≥ 2 recent losses (last 5)</div>
+    <div class="bar"><div class="fill neg" style="width:12%"></div><div class="axis"></div></div>
+    <div class="val neg">−6</div></div>
+  <div class="row"><div class="lbl">≥ 2 consecutive losses</div>
+    <div class="bar"><div class="fill neg" style="width:16%"></div><div class="axis"></div></div>
+    <div class="val neg">−8</div></div>
+</div>
+
+<h3 style="margin-top:18px">v1.10 additions — Spread cost vs T1 distance</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">spread/tDist &gt; 25% (extreme)</div>
+    <div class="bar"><div class="fill neg" style="width:24%"></div><div class="axis"></div></div>
+    <div class="val neg">−12</div></div>
+  <div class="row"><div class="lbl">15% &lt; ratio ≤ 25% (high)</div>
+    <div class="bar"><div class="fill neg" style="width:14%"></div><div class="axis"></div></div>
+    <div class="val neg">−7</div></div>
+  <div class="row"><div class="lbl">8% &lt; ratio ≤ 15% (moderate)</div>
+    <div class="bar"><div class="fill neg" style="width:6%"></div><div class="axis"></div></div>
+    <div class="val neg">−3</div></div>
+</div>
+
+<h3 style="margin-top:18px">v1.10 additions — DOM imbalance (g_DomImbalancePct)</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">|imb| ≥ 60% AND aligned</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:16%"></div><div class="axis"></div></div>
+    <div class="val pos">+8</div></div>
+  <div class="row"><div class="lbl">|imb| ≥ 60% AND against</div>
+    <div class="bar"><div class="fill neg" style="width:12%"></div><div class="axis"></div></div>
+    <div class="val neg">−6</div></div>
+  <div class="row"><div class="lbl">40 ≤ |imb| &lt; 60 AND aligned</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:6%"></div><div class="axis"></div></div>
+    <div class="val pos">+3</div></div>
+  <div class="row"><div class="lbl">40 ≤ |imb| &lt; 60 AND against</div>
+    <div class="bar"><div class="fill neg" style="width:4%"></div><div class="axis"></div></div>
+    <div class="val neg">−2</div></div>
+</div>
+
+<h3 style="margin-top:18px">v1.10 additions — Session-open window (first 15 min after London/NY open)</h3>
+<div class="scoring">
+  <div class="row"><div class="lbl">In window AND SPIKE / NEWS_CONT</div>
+    <div class="bar"><div class="fill pos" style="left:50%;width:12%"></div><div class="axis"></div></div>
+    <div class="val pos">+6</div></div>
+  <div class="row"><div class="lbl">In window AND FLAG / ABCD</div>
+    <div class="bar"><div class="fill neg" style="width:8%"></div><div class="axis"></div></div>
+    <div class="val neg">−4</div></div>
+</div>
+
+<h3 style="margin-top:18px">v1.10 additions — Setup-category prior weight (multiplicative)</h3>
+<table>
+  <tr><th>Category</th><th>Setups</th><th>Weight</th></tr>
+  <tr><td><span class="chip grn">Rare / High conviction</span></td>
+      <td>SPIKE, NEWS_CONT</td>
+      <td><strong style="color:var(--green)">×1.12</strong></td></tr>
+  <tr><td><span class="chip amb">Frequent / Moderate</span></td>
+      <td>FLAG, EMA_PULLBACK, ORB</td>
+      <td><strong style="color:var(--amber)">×0.95</strong></td></tr>
+  <tr><td><span class="chip mute">Other</span></td>
+      <td>VWAP_*, ABCD, LEVEL_*, FADE</td>
+      <td>×1.00</td></tr>
+</table>
+
+<div class="callout warn">
+  <strong>Threshold</strong>
+  Final score (= raw + ctx, then × category weight) must reach <code>InpMinSetupScore</code>
+  (default <strong>60</strong>) to even be considered. Lower it for more action; raise it for cleaner-only entries.
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="ranker">
+<h2><span class="num">7</span>The Ranker — How proposals compete</h2>
+
+<p>Imagine the ranker as a referee. Eleven specialists each shout their best idea; the referee
+ranks them by score and only lets the top one fire if it's strong enough <em>and</em> safe enough.</p>
+
+<svg width="100%" height="200" viewBox="0 0 1000 200" style="background:#0d1117;border-radius:8px;border:1px solid var(--line);margin:14px 0">
+  <text x="20" y="30" fill="#ffd166" font-size="14" font-family="monospace" font-weight="bold">Top 3 of last cycle</text>
+  <rect x="20" y="50" width="700" height="28" fill="#3ecf8e22" stroke="#3ecf8e" rx="4"/>
+  <text x="32" y="70" fill="#3ecf8e" font-size="13" font-family="monospace">#1 BULL_FLAG_M5 · 95 · BUY · R:R 1.6 · ✅ FIRED</text>
+  <text x="730" y="70" fill="#3ecf8e" font-size="22" font-family="monospace" font-weight="bold">95</text>
+
+  <rect x="20" y="88" width="540" height="22" fill="#ffae4222" stroke="#ffae42" rx="4"/>
+  <text x="32" y="105" fill="#ffae42" font-size="12" font-family="monospace">#2 EMA_PULLBACK · 78 · BUY · R:R 1.5</text>
+  <text x="730" y="106" fill="#ffae42" font-size="18" font-family="monospace" font-weight="bold">78</text>
+
+  <rect x="20" y="118" width="380" height="20" fill="#64a8ff22" stroke="#64a8ff" rx="4"/>
+  <text x="32" y="134" fill="#64a8ff" font-size="11" font-family="monospace">#3 LEVEL_BOUNCE · 64 · BUY · R:R 1.7</text>
+  <text x="730" y="135" fill="#64a8ff" font-size="16" font-family="monospace" font-weight="bold">64</text>
+
+  <line x1="800" y1="40" x2="800" y2="160" stroke="#3a455c" stroke-dasharray="4,3"/>
+  <text x="810" y="60" fill="#ffd166" font-size="11" font-family="monospace">MIN = 60</text>
+  <text x="810" y="76" fill="#8b96a8" font-size="10">InpMinSetupScore</text>
+</svg>
+
+<div class="grid-3">
+  <div class="tile" style="text-align:left">
+    <div class="v" style="color:var(--green);font-size:1.3em">FIRED</div>
+    <div class="l" style="color:var(--green)">Best one passes — order sent.</div>
+  </div>
+  <div class="tile" style="text-align:left">
+    <div class="v" style="color:var(--amber);font-size:1.3em">GATED</div>
+    <div class="l" style="color:var(--amber)">Top scorer was blocked by hard gate. Tries #2.</div>
+  </div>
+  <div class="tile" style="text-align:left">
+    <div class="v" style="color:var(--muted);font-size:1.3em">BELOW_THRESH</div>
+    <div class="l" style="color:var(--muted)">Top &lt; 60 — wait for better setup.</div>
+  </div>
+</div>
+
+<p style="margin-top:14px"><em>The latest verdict + top 3 are written to the on-chart panel and the CSV journal so you can always see why a bar didn't fire.</em></p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="gates">
+<h2><span class="num">8</span>Hard Gates — last line of defense before fire</h2>
+
+<p>The winning proposal still has to pass <code>PassesGlobalHardGates</code>. If it fails,
+the ranker tries the second-place proposal once. If both fail → no trade.</p>
+
+<table>
+  <tr><th>Gate</th><th>What it checks</th><th>Setup exemptions</th></tr>
+  <tr><td><code>InpEntryMaxSpreadPts</code></td><td>Spread ≤ 40 pts default</td><td>None</td></tr>
+  <tr><td><code>InpBlockEntryOnSpreadSpike</code></td><td>Block if spread &gt; 1.25× rolling p90</td><td>None</td></tr>
+  <tr><td>Daily loss</td><td><code>g_DailyPnL ≤ -InpMaxDailyLoss</code></td><td>None</td></tr>
+  <tr><td>Cooldowns</td><td>After loss / after any close</td><td>None</td></tr>
+  <tr><td>Session</td><td><code>g_SessionOK</code></td><td>None</td></tr>
+  <tr><td>News window</td><td><code>BlockNewEntriesDueToHighImpactNews</code></td><td><span class="chip red">News-Cont</span></td></tr>
+  <tr><td>RSI caps</td><td><code>InpRsiBlockLongAbove</code> / <code>InpRsiBlockShortBelow</code></td><td><span class="chip ppl">Fade</span></td></tr>
+  <tr><td>M15 vs trade</td><td>Block long if M15 bearish (and reverse)</td><td><span class="chip red">Spike</span> <span class="chip red">News</span> <span class="chip ppl">Fade</span></td></tr>
+  <tr><td>H1 vs trade</td><td>Same for H1 (off by default)</td><td><span class="chip red">Spike</span> <span class="chip red">News</span> <span class="chip ppl">Fade</span></td></tr>
+  <tr><td>M1 align filter</td><td>Last 3 M1 all in opposite color blocks</td><td><span class="chip red">Spike</span> <span class="chip red">News</span> <span class="chip ppl">Fade</span></td></tr>
+  <tr><td><code>InpMinRRToFirstTarget</code></td><td>R:R ≥ 1.10 to T1</td><td>None</td></tr>
+  <tr><td>$-risk cap</td><td>≤ <code>InpMaxRiskDollars</code> (or capped target ratio)</td><td>None</td></tr>
+</table>
+
+<div class="callout">
+  <strong>Why exemptions exist</strong>
+  Spike, News, and Fade catch <em>turns</em>. By definition the M15 / M1 trend at the moment they
+  fire is often <em>opposite</em> to what's about to happen. Forcing HTF-alignment on those
+  setups would defeat their entire purpose.
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="protect">
+<h2><span class="num">9</span>Auto-Protect — every-tick defense</h2>
+
+<p>Once you're in a trade, <code>AutoProtectProfit</code> runs on <strong>every single tick</strong>.
+This is the layered defense system that turns small wins into bankings, prevents profitable trades
+from going red, and cuts losers fast.</p>
+
+<div class="timeline">
+  <div class="tl-item green">
+    <div class="ttl">Profit reaches $0.20 <span class="chip mute">arm green</span></div>
+    <div class="desc">Trade is now <em>armed</em>. NORED rule activates: any drop into red below this peak triggers immediate close.</div>
+  </div>
+  <div class="tl-item green">
+    <div class="ttl">Profit reaches $0.38 (chop) or breakEvenTrigger (run) <span class="chip mute">A-BE</span></div>
+    <div class="desc">Stop-loss moved to entry+5 pts (break-even). Trade is now risk-free.</div>
+  </div>
+  <div class="tl-item green">
+    <div class="ttl">Profit reaches $0.40 → micro-lock ladder <span class="chip mute">$0.18 → $0.58</span></div>
+    <div class="desc">SL trails up in steps as max profit climbs ($0.40, $0.64, $0.72, $0.88, $1.10). Looser in a run, tighter in chop.</div>
+  </div>
+  <div class="tl-item green">
+    <div class="ttl">Profit reaches $0.55 + not in a run <span class="chip mute">A-BNK</span></div>
+    <div class="desc">Auto-bank closes the trade — when there's no M5 trend backing the move, take the cash now.</div>
+  </div>
+  <div class="tl-item amber">
+    <div class="ttl">Peak drop &gt; $0.20 (chop) or $0.30 (run) <span class="chip mute">A-RTR</span></div>
+    <div class="desc">Universal retrace from peak — banks once profit slides this far below max. Run gives more leeway.</div>
+  </div>
+  <div class="tl-item amber">
+    <div class="ttl">Peak ≥ $4 and gave back $2 while still positive <span class="chip mute">A-GVE</span></div>
+    <div class="desc">Big gave-back protection — never let a $4+ winner shrink past $2.</div>
+  </div>
+  <div class="tl-item red">
+    <div class="ttl">Was green ($0.20+ max), now red <span class="chip mute">A-NRD</span></div>
+    <div class="desc">No-Red-After-Green: emergency close to stop the −$0.25 spirals.</div>
+  </div>
+  <div class="tl-item red">
+    <div class="ttl">Peak ≥ $2.50 and current ≤ −$0.30 <span class="chip mute">A-EMR</span></div>
+    <div class="desc">Winner→Red emergency close. Same in chop with smaller peaks.</div>
+  </div>
+  <div class="tl-item red">
+    <div class="ttl">Peak ≥ $2.00 and current ≤ −$0.75 <span class="chip mute">A-CUT</span></div>
+    <div class="desc">"Good start gone bad" — cut the trade.</div>
+  </div>
+  <div class="tl-item red">
+    <div class="ttl">Idle &gt; <code>InpHardTimeStopSec</code> with no movement (off by default)</div>
+    <div class="desc">Optional hard time-stop for true HFT punishment of stagnant trades.</div>
+  </div>
+</div>
+
+<h3>Plus: 70% high-water trail</h3>
+<p>Every <code>InpAPTrailIntervalSec</code> seconds (default 5s), <code>TrailStop()</code> runs
+once. It locks <strong>70 % of the maximum profit ever seen</strong> via the SL — never gives back
+more than 30 %, never moves SL backward.</p>
+
+<svg width="100%" height="160" viewBox="0 0 800 160" style="background:#0d1117;border-radius:8px;border:1px solid var(--line);margin:8px 0">
+  <line x1="40" y1="120" x2="780" y2="120" stroke="#3a455c"/>
+  <line x1="40" y1="20" x2="40" y2="120" stroke="#3a455c"/>
+  <text x="10" y="25" fill="#8b96a8" font-size="10">$2.0</text>
+  <text x="10" y="75" fill="#8b96a8" font-size="10">$1.0</text>
+  <text x="10" y="125" fill="#8b96a8" font-size="10">$0</text>
+  <!-- profit curve -->
+  <path d="M 50 110 L 100 100 L 150 80 L 200 60 L 250 35 L 300 25 L 350 30 L 400 50 L 450 65 L 500 60 L 550 70 L 600 80 L 650 90"
+        fill="none" stroke="#3ecf8e" stroke-width="2.5"/>
+  <!-- max profit dotted line -->
+  <line x1="300" y1="25" x2="650" y2="25" stroke="#ffd166" stroke-dasharray="4,3"/>
+  <text x="660" y="28" fill="#ffd166" font-size="10">MAX</text>
+  <!-- 70% trail -->
+  <path d="M 200 92 L 250 75 L 300 53 L 350 53 L 400 53 L 450 53 L 500 53 L 550 53 L 600 53 L 650 53"
+        fill="none" stroke="#64a8ff" stroke-width="2" stroke-dasharray="3,3"/>
+  <text x="660" y="56" fill="#64a8ff" font-size="10">70% trail SL</text>
+  <text x="50" y="148" fill="#8b96a8" font-size="10">entry</text>
+  <text x="650" y="148" fill="#8b96a8" font-size="10">close</text>
+  <text x="290" y="18" fill="#fff" font-size="11" font-weight="bold">peak</text>
+</svg>
+<p style="font-size:.88em;color:var(--muted)"><em>Green line = profit over time. Yellow dashed = max. Blue dashed = trailed SL locking 70% of max — only ratchets up.</em></p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="panel">
+<h2><span class="num">10</span>The On-Chart Diagnostic Panel (v1.10)</h2>
+
+<p>Top-left of your chart by default (configurable via <code>InpPanelX</code> / <code>InpPanelY</code> /
+<code>InpPanelWidth</code>). Six sections plus a footer, ~840 px tall. Every visible field is updated
+from a global, so you can see <em>exactly</em> why a setup did/didn't fire without reading the Experts log.</p>
+
+<div class="grid-2">
+  <div>
+    <h3>Sections</h3>
+    <ul>
+      <li><strong style="color:var(--accent)">▼ TRADE</strong> — Status (BUY/SELL + lot size), Setup name + score, Entry/SL prices, T1/RR, live P/L, Best/Age</li>
+      <li><strong style="color:var(--purple)">▼ RANKER</strong> — Verdict (FIRED / GATED / BELOW / NO_PROPOSAL / REJECTED), next-cycle countdown + last-cycle proposal count, top 3 candidates each with their <em>full block reason</em> (PASS or the gate that fails them)</li>
+      <li><strong style="color:var(--green)">▼ MARKET</strong> — M15/H1 bias arrows, M5 trend % + ADX, regime label, session + minutes-to-close, session-open-window indicator, spread + DOM imbalance, ATR M1/M5</li>
+      <li><strong style="color:var(--amber)">▼ TODAY</strong> — Daily P/L + progress bar (vs <code>InpDailyProfitTarget</code>), Win/Loss + averages, exit-reason mini-tally (BNK×2 RTR×1 NRD×1 SL×2…)</li>
+      <li><strong style="color:var(--red)">▼ SUSPENDED</strong> — Lists every setup currently in cooldown with its remaining time. Auto-collapses to "(no setups suspended) ✓" when nothing is locked out</li>
+      <li><strong style="color:var(--accent)">▼ RISK</strong> — Live dynamic cap, daily-halt usage progress bar</li>
+    </ul>
+
+    <h3>Regime labels you may see</h3>
+    <ul>
+      <li><span class="chip grn">TREND_ADX</span> ADX ≥ 25 + M5 trend established</li>
+      <li><span class="chip acc">TREND_SOFT</span> M5 trend present, ADX moderate</li>
+      <li><span class="chip mute">RANGE_CHOP</span> No M5 trend</li>
+      <li><span class="chip mute">RANGE_QUIET</span> Low volatility regime</li>
+      <li><span class="chip amb">IMPULSE_BURST</span> No trend yet but explosive M5 bar</li>
+      <li><span class="chip amb">VOL_EXPLOSIVE</span> High ATR vs avg — Spike/News favored</li>
+      <li><span class="chip red">NEWS_BLACKOUT</span> Within HIGH-event window</li>
+    </ul>
+  </div>
+
+  <div>
+    <div class="panel-mock" style="font-family:'JetBrains Mono','Consolas',monospace;font-size:.78em">
+      <div class="ph">
+        <div class="t">GOLD-HFT-SCALPER v1.11</div>
+        <div class="s">9-strategy ranker</div>
+      </div>
+
+      <div class="pb">
+        <div class="h" style="background:#40557540">▼ TRADE</div>
+        <div class="row-m"><span class="k">Status:</span><span class="v green">▲ BUY 0.01 lot</span></div>
+        <div class="row-m"><span class="k">Setup:</span><span class="v" style="color:#64a8ff">SPIKE (87)</span></div>
+        <div class="row-m"><span class="k">Entry/SL:</span><span class="v">2403.45 / 2402.80</span></div>
+        <div class="row-m"><span class="k">T1/RR:</span><span class="v">2404.55 / 1.7</span></div>
+        <div class="row-m"><span class="k">P/L:</span><span class="v green">+$1.42 ✓</span></div>
+        <div class="row-m"><span class="k">Best/Age:</span><span class="v">+$1.85 / 24s</span></div>
+      </div>
+
+      <div class="pb">
+        <div class="h" style="background:#52427240">▼ RANKER</div>
+        <div class="row-m"><span class="k">Verdict:</span><span class="v green">FIRED SPIKE</span></div>
+        <div class="row-m"><span class="k">Next/Cnt:</span><span class="v" style="color:#b88dff">in 2s | last cycle: 4</span></div>
+        <div class="top t1" style="color:#dde">#1 SPIKE 87 B RR1.7</div>
+        <div style="font-size:.85em;color:#3ecf8e;padding-left:14px">  PASS</div>
+        <div class="top t2">#2 ORB 74 B RR1.5</div>
+        <div style="font-size:.85em;color:#ffae42;padding-left:14px">  M15 bullish (block short)</div>
+        <div class="top t3">#3 FLAG 62 B RR1.3</div>
+        <div style="font-size:.85em;color:#ffae42;padding-left:14px">  below threshold (62 < 60)</div>
+      </div>
+
+      <div class="pb">
+        <div class="h" style="background:#426a5240">▼ MARKET</div>
+        <div class="row-m"><span class="k">M15/H1:</span><span class="v green">UP / —</span></div>
+        <div class="row-m"><span class="k">M5/ADX:</span><span class="v green">▲ UP 78% / ADX 24.3</span></div>
+        <div class="row-m"><span class="k">Regime:</span><span class="v green">TREND_NORMAL</span></div>
+        <div class="row-m"><span class="k">Session:</span><span class="v green">NY ● (closes 142m)</span></div>
+        <div class="row-m"><span class="k">OpenWin:</span><span class="v" style="color:#64a8ff">NY +08m (boost SPK/NEWS)</span></div>
+        <div class="row-m"><span class="k">Spread:</span><span class="v green">22 pts ✓</span></div>
+        <div class="row-m"><span class="k">DOM imb:</span><span class="v" style="color:#64a8ff">+47% (bid lean)</span></div>
+        <div class="row-m"><span class="k">ATR M1/5:</span><span class="v">$1.85 / $4.20</span></div>
+      </div>
+
+      <div class="pb">
+        <div class="h" style="background:#62524240">▼ TODAY</div>
+        <div class="row-m"><span class="k">P/L:</span><span class="v green">+$8.40</span></div>
+        <div style="margin:6px 12px;height:8px;background:#2d3340;border-radius:4px;overflow:hidden"><div style="width:42%;height:100%;background:#3ecf8e"></div></div>
+        <div style="font-size:.85em;color:#8b96a8;padding-left:12px">vs $20 target</div>
+        <div class="row-m"><span class="k">W/L Avg:</span><span class="v">4/6 (67%) +$3.10/-$1.80</span></div>
+        <div class="row-m"><span class="k">Exits:</span><span class="v">BNK×2 RTR×1 NRD×1 SL×2</span></div>
+      </div>
+
+      <div class="pb">
+        <div class="h" style="background:#72525240">▼ SUSPENDED</div>
+        <div class="row-m" style="color:#ff8a8a">ABCD: resumes in 31m23s</div>
+        <div class="row-m" style="color:#8b96a8">(no other setups suspended)</div>
+      </div>
+
+      <div class="pb">
+        <div class="h" style="background:#52628240">▼ RISK</div>
+        <div class="row-m"><span class="k">Cap/trade:</span><span class="v" style="color:#64a8ff">$4.75 (max $6.00)</span></div>
+        <div class="row-m"><span class="k">Halt:</span><span class="v"><span style="display:inline-block;width:120px;height:8px;background:#2d3340;border-radius:4px;overflow:hidden;vertical-align:middle"><span style="display:inline-block;width:18%;height:100%;background:#3ecf8e"></span></span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout">
+  <strong>Why this is a step change vs v1.00</strong>
+  Block reasons are no longer truncated to 22 characters. Per-top reasons are computed before
+  firing, so you see why <em>each</em> top-3 would or wouldn't trade. Suspended setups are visible
+  with countdowns. Exit-reason tally answers "what's bleeding me" without parsing the CSV.
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="inputs">
+<h2><span class="num">11</span>Input Reference</h2>
+
+<h3>Trade (v1.10 — sizing now multi-layer)</h3>
+<table>
+  <tr><th>Input</th><th>Default</th><th>What it does</th></tr>
+  <tr><td><code>InpLotSize</code></td><td>0.01</td><td>Base lot. Final lot = base × regime mul × asym mul.</td></tr>
+  <tr><td><code>InpLotMulQuiet</code></td><td>0.5</td><td>Regime mul (Quiet — cut size, low conviction).</td></tr>
+  <tr><td><code>InpLotMulNormal</code></td><td>1.0</td><td>Regime mul (Normal — full size).</td></tr>
+  <tr><td><code>InpLotMulElevated</code></td><td>1.0</td><td>Regime mul (Elevated — full size).</td></tr>
+  <tr><td><code>InpLotMulExplosive</code></td><td>0.5</td><td>Regime mul (Explosive — slip risk, cut size).</td></tr>
+  <tr><td><code>InpAsymSize</code> <span class="chip gold">NEW</span></td><td>true</td><td>Asymmetric position sizing on/off.</td></tr>
+  <tr><td><code>InpAsymMul_60_75</code> <span class="chip gold">NEW</span></td><td>0.50</td><td>Lot mul for score 60-74 (weakest tradeable).</td></tr>
+  <tr><td><code>InpAsymMul_75_85</code> <span class="chip gold">NEW</span></td><td>0.75</td><td>Lot mul for score 75-84 (good).</td></tr>
+  <tr><td><code>InpAsymMul_85_plus</code> <span class="chip gold">NEW</span></td><td>1.00</td><td>Lot mul for score 85+ (A+ setup, full size).</td></tr>
+  <tr><td><code>InpMaxRiskDollars</code></td><td>6.00</td><td>Hard cap per trade. SL clamp + lot auto-shrink enforce this.</td></tr>
+  <tr><td><code>InpMaxPositions</code></td><td>1</td><td>One concurrent trade.</td></tr>
+  <tr><td><code>InpEntryNewBarTimeframe</code></td><td>M1</td><td>Cycle clock. Set M5 for calmer trading.</td></tr>
+  <tr><td><code>InpEntryOnNewBarOnly</code></td><td>false</td><td>True = only run ranker on bar opens.</td></tr>
+  <tr><td><code>InpEntryIntervalSec</code></td><td>3</td><td>Min seconds between ranker cycles.</td></tr>
+</table>
+
+<h3>Ranker</h3>
+<table>
+  <tr><th>Input</th><th>Default</th><th>What it does</th></tr>
+  <tr><td><code>InpMinSetupScore</code></td><td>60</td><td>Top proposal must reach this to fire.</td></tr>
+  <tr><td><code>InpMinRRToFirstTarget</code></td><td>1.10</td><td>R:R floor against strategy SL.</td></tr>
+  <tr><td><code>InpRankerLogTopN</code></td><td>3</td><td>Top-N written to CSV per cycle.</td></tr>
+  <tr><td><code>InpVerboseSkips</code></td><td>true</td><td>Print skip reasons in Experts tab.</td></tr>
+</table>
+
+<h3>Per-strategy controls</h3>
+<p>Each strategy has at minimum: <code>InpEnableXXX</code> (toggle) and <code>InpXXXRawScore</code>
+(its base score before context bonus). Plus strategy-specific thresholds (body × ATR multipliers,
+distance limits, etc). See <a href="GOLD-HFT-SCALPER.mq5">the .mq5</a> Inputs section for
+the full list.</p>
+
+<h3>Auto-Protect</h3>
+<table>
+  <tr><th>Input</th><th>Default</th><th>What it does</th></tr>
+  <tr><td><code>InpAPRunnerM5StrengthPct</code></td><td>60</td><td>Min M5% for "in a run" classification.</td></tr>
+  <tr><td><code>InpAPAutoBankScalp</code></td><td>true</td><td>Auto-bank if not running.</td></tr>
+  <tr><td><code>InpAPScalpBankUsd</code></td><td>0.55</td><td>Bank threshold $.</td></tr>
+  <tr><td><code>InpAPNoRedAfterGreen</code></td><td>true</td><td>Close on green-then-red.</td></tr>
+  <tr><td><code>InpAPGreenArmUsd</code></td><td>0.20</td><td>"Was green" arming level.</td></tr>
+  <tr><td><code>InpAPUniversalRetrace</code></td><td>true</td><td>Retrace from peak (run + chop).</td></tr>
+  <tr><td><code>InpAPRetraceChopUsd</code></td><td>0.20</td><td>Chop drop from peak → bank.</td></tr>
+  <tr><td><code>InpAPRetraceRunUsd</code></td><td>0.30</td><td>Run drop (looser).</td></tr>
+  <tr><td><code>InpAPMicroTrail</code></td><td>true</td><td>Micro-lock ladder.</td></tr>
+  <tr><td><code>InpAPMicroLockFromUsd</code></td><td>0.40</td><td>First micro-lock arm.</td></tr>
+  <tr><td><code>InpAPWinnerGoneRedUsd</code></td><td>0.30</td><td>Winner→red close threshold.</td></tr>
+  <tr><td><code>InpHardTimeStopSec</code></td><td>0 (off)</td><td>HFT idle-trade cut.</td></tr>
+  <tr><td><code>InpAPTrailIntervalSec</code></td><td>5</td><td>70% trail tick rate.</td></tr>
+  <tr><td><code>InpAdaptiveRetrace</code> <span class="chip gold">NEW v1.11</span></td><td>true</td><td>Auto-widen retrace tolerances when ARTR is over-firing today.</td></tr>
+  <tr><td><code>InpAdaptiveRetraceTrigger</code> <span class="chip gold">NEW v1.11</span></td><td>3</td><td>Number of ARTR exits today before widening kicks in.</td></tr>
+  <tr><td><code>InpAdaptiveRetraceMul</code> <span class="chip gold">NEW v1.11</span></td><td>1.20</td><td>Multiplier applied to chop+run retrace thresholds when triggered.</td></tr>
+</table>
+
+<h3>Risk &amp; Sessions (v1.10 — adds suspension + open-window)</h3>
+<table>
+  <tr><th>Input</th><th>Default</th><th>What it does</th></tr>
+  <tr><td><code>InpMaxDailyLoss</code></td><td>50.0</td><td>Halt for the day at this $ loss.</td></tr>
+  <tr><td><code>InpMaxConsecLosses</code></td><td>0</td><td>Global consec-loss cap. 0 = disabled.</td></tr>
+  <tr><td><code>InpCooldownAfterLoss</code></td><td>20</td><td>Sec cooldown after a loss.</td></tr>
+  <tr><td><code>InpCooldownAfterClose</code></td><td>20</td><td>Sec cooldown after any close.</td></tr>
+  <tr><td><code>InpSuspendAfter2Losses</code> <span class="chip gold">NEW</span></td><td>true</td><td>2 consec losses on the same setup kind → suspend that kind.</td></tr>
+  <tr><td><code>InpSuspendDurationMin</code> <span class="chip gold">NEW</span></td><td>45</td><td>Suspension cooldown (minutes) per setup kind.</td></tr>
+  <tr><td><code>InpDailyProfitTarget</code> <span class="chip gold">NEW</span></td><td>20.0</td><td>Reference for the daily-P/L progress bar on the panel.</td></tr>
+  <tr><td><code>InpUseSessionFilter</code></td><td>true</td><td>Trade London / NY only.</td></tr>
+  <tr><td><code>InpLondonStart/End</code></td><td>8 / 16</td><td>Server hour.</td></tr>
+  <tr><td><code>InpNYStart/End</code></td><td>13 / 21</td><td>Server hour.</td></tr>
+  <tr><td><code>InpSessionOpenWindowMin</code> <span class="chip gold">NEW v1.10</span></td><td>15</td><td>First N minutes of a session = "open window". Boost SPK/NEWS, penalize FLG/ABCD.</td></tr>
+  <tr><td><code>InpAvoidWeekendGap</code> <span class="chip gold">NEW v1.11</span></td><td>true</td><td>Friday after <code>InpFridayCloseHour</code>: <code>g_Session = WEEKEND_CLOSE</code>, no new entries (existing positions still managed by AutoProtect).</td></tr>
+  <tr><td><code>InpFridayCloseHour</code> <span class="chip gold">NEW v1.11</span></td><td>20</td><td>Server hour on Friday to stop new entries (default 20 = 1h before NY end).</td></tr>
+  <tr><td><code>InpUseDomImbalance</code> <span class="chip gold">NEW v1.11</span></td><td>true</td><td>Disable on retail brokers w/ synthetic DOM (panel DOM bonus oscillating wildly).</td></tr>
+  <tr><td><code>InpBlockHighImpactNewEntries</code></td><td>true</td><td>Block within news window. <em>v1.11: now reads cached flag instead of issuing a CalendarValueHistory call per check.</em></td></tr>
+  <tr><td><code>InpHighImpactNewsBeforeMin</code></td><td>15</td><td>Min before event.</td></tr>
+  <tr><td><code>InpHighImpactNewsAfterMin</code></td><td>10</td><td>Min after event.</td></tr>
+</table>
+
+<h3>ABCD &amp; Level — v1.10 throttle</h3>
+<table>
+  <tr><th>Input</th><th>v1.00</th><th>v1.10</th><th>Why</th></tr>
+  <tr><td><code>InpABCDRawScore</code></td><td>62</td><td><strong>74</strong></td><td>ABCD detection is noisy; raise base so it must clear strong context to fire</td></tr>
+  <tr><td><code>InpABCDMinADX</code> <span class="chip gold">NEW</span></td><td>—</td><td><strong>22</strong></td><td>Hard-block ABCD when there is no actual M5 trend</td></tr>
+  <tr><td><code>InpLevelRawScore</code></td><td>60</td><td><strong>72</strong></td><td>Level detection too loose alone; require strong context</td></tr>
+  <tr><td><code>InpLevelMinADX</code> <span class="chip gold">NEW</span></td><td>—</td><td><strong>22</strong></td><td>Bypass with confirmed magnet (<code>g_Levels.nearMagnet</code>); else require trend</td></tr>
+</table>
+
+<h3>Display (v1.10 — new panel layout)</h3>
+<table>
+  <tr><th>Input</th><th>Default</th><th>What it does</th></tr>
+  <tr><td><code>InpShowPanel</code></td><td>true</td><td>Show diagnostic panel.</td></tr>
+  <tr><td><code>InpPanelX</code> <span class="chip gold">NEW v1.10</span></td><td>10</td><td>Panel X anchor (px from chart left).</td></tr>
+  <tr><td><code>InpPanelY</code> <span class="chip gold">NEW v1.10</span></td><td>25</td><td>Panel Y anchor (px from chart top).</td></tr>
+  <tr><td><code>InpPanelWidth</code> <span class="chip gold">NEW v1.10</span></td><td>380</td><td>Panel width (px). Wider = more diagnostic info per row.</td></tr>
+  <tr><td><code>InpPanelRedrawEveryN</code> <span class="chip gold">NEW v1.11</span></td><td>5</td><td><code>UpdatePanel</code> only triggers <code>ChartRedraw(0)</code> every N panel updates. Trade fills/exits force-redraw immediately. Set to 1 to revert to v1.10 behaviour.</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="tuning">
+<h2><span class="num">12</span>Tuning Recipes</h2>
+
+<div class="grid-2">
+  <div class="setup">
+    <div class="head"><div class="title" style="color:var(--green)">🔥 More action</div></div>
+    <div class="body">
+      <ul>
+        <li><code>InpMinSetupScore</code> → <strong>50</strong></li>
+        <li><code>InpEntryIntervalSec</code> → <strong>1</strong></li>
+        <li><code>InpEntryOnNewBarOnly</code> → <strong>false</strong></li>
+        <li>Keep all 11 setups enabled.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="title" style="color:var(--accent)">💎 Cleanest only</div></div>
+    <div class="body">
+      <ul>
+        <li><code>InpMinSetupScore</code> → <strong>80</strong></li>
+        <li><code>InpBlockH1VsTrade</code> → <strong>true</strong></li>
+        <li><code>InpUseM1AlignFilter</code> → <strong>true</strong> (already on)</li>
+        <li><code>InpMinRRToFirstTarget</code> → <strong>1.30</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="title" style="color:var(--red)">⏱ HFT cut-losses-short</div></div>
+    <div class="body">
+      <ul>
+        <li><code>InpHardTimeStopSec</code> → <strong>90</strong></li>
+        <li><code>InpHardTimeStopMinAbsUsd</code> → <strong>0.15</strong></li>
+        <li><code>InpAPRetraceChopUsd</code> → <strong>0.15</strong> (tighter)</li>
+        <li><code>InpAPScalpBankUsd</code> → <strong>0.40</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="title" style="color:var(--gold)">🚀 Spike-only mode</div></div>
+    <div class="body">
+      <ul>
+        <li>Disable all setups except <strong>Spike</strong> and <strong>News-Cont</strong></li>
+        <li><code>InpMinSetupScore</code> → <strong>50</strong></li>
+        <li><code>InpEntryIntervalSec</code> → <strong>1</strong></li>
+        <li>Best on news days / Asian-EU / EU-US opens.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="title" style="color:var(--purple)">📈 Trend-day mode</div></div>
+    <div class="body">
+      <ul>
+        <li>Disable <strong>Fade, LevelBounce, VWAPReclaim</strong></li>
+        <li><code>InpFlagRawScore</code> → <strong>+10</strong></li>
+        <li><code>InpEMAPullbackRawScore</code> → <strong>+10</strong></li>
+        <li><code>InpAPRetraceRunUsd</code> → <strong>0.40</strong> (let runners breathe)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="setup">
+    <div class="head"><div class="title" style="color:var(--amber)">🌙 Calm / range-day mode</div></div>
+    <div class="body">
+      <ul>
+        <li>Disable <strong>Spike, News-Cont</strong></li>
+        <li>Boost <strong>LevelBounce, VWAPReclaim, Fade</strong> raw scores by +5</li>
+        <li><code>InpEntryNewBarTimeframe</code> → <strong>M5</strong></li>
+        <li><code>InpEntryIntervalSec</code> → <strong>60</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="callout ok" style="margin-top:14px">
+  <strong>Per-strategy expectancy review</strong>
+  After a few sessions, open <code>MQL5\Files\GOLD-HFT-SCALPER\Logs\Gold-HFT-Scalper-journal.csv</code> in Excel.
+  Filter for events <code>EXIT_WIN</code> + <code>EXIT_LOSS</code>, group by the
+  <em>secondary</em> column (strategy name), sum the <em>primary</em> column ($ result).
+  Disable any strategy with negative cumulative expectancy and re-test.
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="journal">
+<h2><span class="num">13</span>CSV Journal</h2>
+
+<p>Path: <code>&lt;MT5 Data Folder&gt;\MQL5\Files\GOLD-HFT-SCALPER\Logs\Gold-HFT-Scalper-journal.csv</code></p>
+
+<div class="callout ok">
+  <strong>Easy access</strong>
+  In MT5 menu: <code>File → Open Data Folder → MQL5\Files\GOLD-HFT-SCALPER\Logs\</code>
+  &mdash; the EA auto-creates this folder structure on the first trade event. Just compile and run; nothing else to do.
+</div>
+
+<table>
+  <tr><th>Event</th><th>When</th><th>Key columns</th></tr>
+  <tr>
+    <td><code>RANKER</code></td>
+    <td>Every cycle with ≥ 1 proposal</td>
+    <td><strong>primary</strong> = "<em>n</em> proposals"<br>
+        <strong>detail</strong> = NAME=score[rr=x] NAME=score[rr=x] ...</td>
+  </tr>
+  <tr>
+    <td><code>ENTRY_FILL</code></td>
+    <td>Order opened</td>
+    <td><strong>primary</strong> = BUY / SELL<br>
+        <strong>secondary</strong> = strategy name<br>
+        <strong>detail</strong> = score=...;rr=...;riskUsd=...;order=...;posId=...</td>
+  </tr>
+  <tr>
+    <td><code>EXIT_WIN</code> / <code>EXIT_LOSS</code></td>
+    <td>Trade closed (any cause)</td>
+    <td><strong>primary</strong> = $P/L<br>
+        <strong>secondary</strong> = position id<br>
+        <strong>detail</strong> = close-comment | open_setup=…;open_score=…;open_reg=…</td>
+  </tr>
+</table>
+
+<h3>Sample rows</h3>
+<pre style="background:#0a0d12;padding:14px;border-radius:8px;color:#cdd6e0;font-size:.82em;overflow-x:auto;border:1px solid var(--line)">
+2026.05.03 13:45:21;RANKER;XAUUSD;TREND_ADX;78.50;22.0;3 proposals;;FLAG=95.0[rr=1.6] EMA_PULLBACK=78.0[rr=1.5] LEVEL_BOUNCE=64.0[rr=1.7]
+2026.05.03 13:45:24;ENTRY_FILL;XAUUSD;TREND_ADX;95.00;22.0;BUY;FLAG;score=95.00;rr=1.60;riskUsd=2.40;order=12345678;posId=12345678
+2026.05.03 13:51:08;EXIT_WIN;XAUUSD;TREND_ADX;95.00;24.0;1.85;12345678;ABNK:not runner bank | open_reg=TREND_ADX;open_setup=FLAG;open_score=95.00
+</pre>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="card" id="faq">
+<h2><span class="num">14</span>FAQ</h2>
+
+<h3>Does it use any AI?</h3>
+<p>No. It's pure deterministic algorithm. No OpenAI, no neural net, no remote calls. Same machine
+every time.</p>
+
+<h3>Will it work on a $50 account?</h3>
+<p>Default <code>InpLotSize = 0.01</code> (micro-lot) and <code>InpMaxRiskDollars = 6.00</code>
+fits a small account. But check your broker's minimum lot — if 0.01 produces $1+ swings on a
+small account, drop <code>InpMaxDailyLoss</code> to keep yourself out of trouble.</p>
+
+<h3>What broker / symbol do I need?</h3>
+<p>Any MT5 broker offering Gold (XAUUSD). The strategies use $10 round-number levels and
+ATR-relative thresholds, so they adapt to brokers that price gold at $1,800, $2,400, $3,000, etc.
+without changes.</p>
+
+<h3>Will it pyramid / open multiple trades?</h3>
+<p>Not by default. <code>InpMaxPositions = 1</code>. The ranker won't open a second trade until
+the first one closes.</p>
+
+<h3>Do I need to set up <code>WebRequest</code>?</h3>
+<p>No. There are zero outbound HTTP calls.</p>
+
+<h3>Is it safe to run alongside the AI scalper?</h3>
+<p>Yes. Different magic number (998877 vs 778899) and different CSV journal. Each EA only manages
+its own positions.</p>
+
+<h3>Why don't I see any trades?</h3>
+<p>Check the panel's <strong>Verdict</strong> line:</p>
+<ul>
+  <li><strong>NO_PROPOSAL</strong> → market is too quiet for any setup. Wait, or lower thresholds.</li>
+  <li><strong>BELOW_THRESH (45 &lt; 60)</strong> → setups are detecting but not strong enough. Lower <code>InpMinSetupScore</code>.</li>
+  <li><strong>GATED FLAG (spread spike)</strong> → top setup blocked by a gate. Reason in parentheses.</li>
+</ul>
+<p>Also check Experts tab for skip messages if <code>InpVerboseSkips = true</code>.</p>
+
+<h3>Can I disable individual strategies?</h3>
+<p>Yes — every strategy has its own <code>InpEnableXXX</code> input. Toggle off any you don't
+want, the ranker simply won't see proposals from it.</p>
+
+<h3>How do I know which strategy opened a trade?</h3>
+<p>Three places:</p>
+<ol>
+  <li>The on-chart panel POSITION box shows the setup name + score</li>
+  <li>The MT5 order comment is prefixed with the strategy tag (e.g. <code>SPK-95-B:...</code>)</li>
+  <li>The CSV journal's <code>secondary</code> column on every <code>EXIT_*</code> row contains <code>open_setup=&lt;name&gt;</code></li>
+</ol>
+</section>
+
+<footer>
+  GOLD-HFT-SCALPER · v1.11 · Pure-algorithmic XAUUSD HFT scalper<br>
+  See <a href="GOLD-HFT-SCALPER-LOGIC.md">GOLD-HFT-SCALPER-LOGIC.md</a> for technical reference ·
+  Source: <a href="GOLD-HFT-SCALPER.mq5">GOLD-HFT-SCALPER.mq5</a><br>
+  <span style="color:var(--muted-2);font-size:.85em">The .mq5 file is the source of truth if anything in this guide disagrees.</span>
+</footer>
+
+</div>
+</body>
+</html>
